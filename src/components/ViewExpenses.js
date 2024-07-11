@@ -90,6 +90,7 @@ const ViewExpenses = () => {
                 </tbody>
             </table>
             <Link to="/addexpense">Add Expense</Link>
+            <Link to="/unauthorized">TetstThing</Link>
         </div>
     );
 }
