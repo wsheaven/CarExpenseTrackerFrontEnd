@@ -8,6 +8,7 @@ import Missing from "./components/Missing.js";
 import AddExpenses from "./components/AddExpenses.js";
 import Home from "./components/Home.js";
 import RequireAuth from "./components/RequireAuth.js";
+import PersistLogin from "./components/PersistLogin.js";
 
 function App() {
   return (
@@ -15,12 +16,16 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route path="Login" element={<Login />} />
         <Route path="Register" element={<Register />} />
-        <Route path="Unauthorized" element={<Unauthorized />} />
+        
 
         <Route path="/" element={<Home />} />
+
+        <Route element={<PersistLogin />}>
         <Route element={<RequireAuth />}>
           <Route path="ViewExpenses" element={<ViewExpenses />} />
           <Route path="AddExpense" element={<AddExpenses />} />
+          <Route path="Unauthorized" element={<Unauthorized />} />
+        </Route>
         </Route>
         <Route path="Missing" element={<Missing />} />
       </Route>

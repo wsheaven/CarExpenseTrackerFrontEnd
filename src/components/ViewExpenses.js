@@ -1,97 +1,155 @@
 import React, { useEffect, useState } from 'react';
 import useAuth from "../hooks/useAuth";
-import axios from '../api/axios';
-import { Link } from 'react-router-dom';
+import useAxiosPrivate from "../hooks/useAxiosPrivate";
+import { Link, useNavigate, useLocation } from 'react-router-dom';
+import useLogout from '../hooks/useLogout';
+import '../index.css';
 
 const EXPENSE_URL = '/api/expenses/user/';
 
 const ViewExpenses = () => {
     const { auth } = useAuth();
     const [expenses, setExpenses] = useState([]);
+    const axiosPrivate = useAxiosPrivate();
+    const navigate = useNavigate()
+    const location = useLocation()
+    const logout = useLogout()
+
+    const signOut = async () => {
+        await logout()
+        navigate('/login')
+    }
 
     useEffect(() => {
         const fetchExpenses = async () => {
             try {
-                const response = await axios.get(`${EXPENSE_URL}${encodeURIComponent(auth.userId)}`, {
+                const response = await axiosPrivate.get(`${EXPENSE_URL}${encodeURIComponent(auth.userId)}`, {
                     headers: { Authorization: `Bearer ${auth.accessToken}` }
                 });
                 setExpenses(response.data);
                 console.log("Expenses fetched successfully");
             } catch (error) {
                 console.error("Failed to fetch expenses", error);
+                navigate('/login', {state: {from: location}, replace: true})
             }
         };
 
         fetchExpenses();
-    }, [auth.userId, auth.accessToken]);
+    }, [auth.userId, auth.accessToken, axiosPrivate]);
 
     const gasExpenses = expenses.filter(expense => expense.isGasExpense);
     const regularExpenses = expenses.filter(expense => !expense.isGasExpense);
 
-    const tableStyle = {
-        width: '100%',
-        borderCollapse: 'collapse',
-        marginBottom: '20px'
-    };
+    const totalGasCost = gasExpenses.reduce((total, expense) => total + expense.cost, 0);
+    const totalOtherCost = regularExpenses.reduce((total, expense) => total + expense.cost, 0);
+    const totalCost = totalGasCost + totalOtherCost;
 
-    const cellStyle = {
-        border: '1px solid black',
-        padding: '8px',
-        textAlign: 'left',
-    };
+    const lastMonth = new Date();
+    lastMonth.setMonth(lastMonth.getMonth() - 1);
+
+    const gasExpensesLastMonth = gasExpenses.filter(expense => new Date(expense.date) > lastMonth);
+    const regularExpensesLastMonth = regularExpenses.filter(expense => new Date(expense.date) > lastMonth);
+
+    const totalGasCostLastMonth = gasExpensesLastMonth.reduce((total, expense) => total + expense.cost, 0);
+    const totalOtherCostLastMonth = regularExpensesLastMonth.reduce((total, expense) => total + expense.cost, 0);
+    const totalCostLastMonth = totalGasCostLastMonth + totalOtherCostLastMonth;
+
+    const averageMpgAllTime = gasExpenses.length > 0 ? gasExpenses.reduce((total, expense) => total + (expense.milesPerGallon || 0), 0) / gasExpenses.length : 0;
+    const averageMpgLastMonth = gasExpensesLastMonth.length > 0 ? gasExpensesLastMonth.reduce((total, expense) => total + (expense.milesPerGallon || 0), 0) / gasExpensesLastMonth.length : 0;
 
     return (
-        <div>
-            <h1>Gas Expenses</h1>
-            <table style={tableStyle}>
-                <thead>
-                    <tr>
-                        <th style={cellStyle}>Cost ($)</th>
-                        <th style={cellStyle}>Miles Traveled</th>
-                        <th style={cellStyle}>Gallons</th>
-                        <th style={cellStyle}>Miles per Gallon</th>
-                        <th style={cellStyle}>Notes</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {gasExpenses.map(expense => (
-                        <tr key={expense._id}>
-                            <td style={cellStyle}>{expense.cost}</td>
-                            <td style={cellStyle}>{expense.milesTraveledForGas}</td>
-                            <td style={cellStyle}>{expense.gasGallons}</td>
-                            <td style={cellStyle}>{expense.milesPerGallon ? expense.milesPerGallon.toFixed(1) : 'N/A'}</td>
-                            <td style={cellStyle}>{expense.notes}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
+        <>
+        <div className="flex flex-col items-center justify-center flex-1 w-full p-4">
+        <h1 className="text-2xl font-bold">Expense Summary</h1>
+        <div className="flex flex-col w-full max-w-4xl overflow-x-auto mt-8">
+  <table className="table w-full">
+    <thead className="bg-base-200">
+      <tr>
+        <th className="text-sm lg:text-base rounded-tl-lg p-2"> </th>
+        <th className="text-sm lg:text-base p-2">All Time</th>
+        <th className="text-sm lg:text-base rounded-tr-lg p-2">Last Month</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr className="hover">
+        <td className="p-2">Total Gas Cost</td>
+        <td className="p-2">${totalGasCost.toFixed(2)}</td>
+        <td className="p-2">${totalGasCostLastMonth.toFixed(2)}</td>
+      </tr>
+      <tr className="hover">
+        <td className="p-2">Total Other Costs</td>
+        <td className="p-2">${totalOtherCost.toFixed(2)}</td>
+        <td className="p-2">${totalOtherCostLastMonth.toFixed(2)}</td>
+      </tr>
+      <tr className="hover">
+        <td className="p-2">Total Cost</td>
+        <td className="p-2">${totalCost.toFixed(2)}</td>
+        <td className="p-2">${totalCostLastMonth.toFixed(2)}</td>
+      </tr>
+      <tr className="hover">
+        <td className="p-2">Average MPG</td>
+        <td className="p-2">{averageMpgAllTime.toFixed(2)}</td>
+        <td className="p-2">{averageMpgLastMonth.toFixed(2)}</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
-            <h1>Regular Expenses</h1>
-            <table style={tableStyle}>
-                <thead>
-                    <tr>
-                        <th style={cellStyle}>Category</th>
-                        <th style={cellStyle}>Cost</th>
-                        <th style={cellStyle}>Notes</th>
-                        <th style={cellStyle}>Mileage</th>
-                        <th style={cellStyle}>Date</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {regularExpenses.map(expense => (
-                        <tr key={expense._id}>
-                            <td style={cellStyle}>{expense.category}</td>
-                            <td style={cellStyle}>${expense.cost}</td>
-                            <td style={cellStyle}>{expense.notes}</td>
-                            <td style={cellStyle}>{expense.mileage} miles</td>
-                            <td style={cellStyle}>{new Date(expense.date).toLocaleDateString()}</td>
-                        </tr>
-                    ))}
-                </tbody>
-            </table>
-            <Link to="/addexpense">Add Expense</Link>
-            <Link to="/unauthorized">TetstThing</Link>
+  
+<h1 className="text-2xl font-bold mt-8">Gas Expenses</h1>
+<div className="flex flex-col w-full max-w-4xl overflow-x-auto mt-8">
+  <table className="table w-full">
+    <thead className="bg-base-200">
+      <tr>
+        <th className="text-sm lg:text-base p-2">Cost ($)</th>
+        <th className="text-sm lg:text-base p-2">Miles Traveled</th>
+        <th className="text-sm lg:text-base p-2">Gallons</th>
+        <th className="text-sm lg:text-base p-2">Miles per Gallon</th>
+        <th className="text-sm lg:text-base p-2">Notes</th>
+      </tr>
+    </thead>
+    <tbody>
+      {gasExpenses.map(expense => (
+        <tr className="hover" key={expense._id}>
+          <td className="p-2">{expense.cost}</td>
+          <td className="p-2">{expense.milesTraveledForGas}</td>
+          <td className="p-2">{expense.gasGallons}</td>
+          <td className="p-2">{expense.milesPerGallon ? expense.milesPerGallon.toFixed(1) : 'N/A'}</td>
+          <td className="p-2">{expense.notes}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+
+<h1 className="text-2xl font-bold mt-8">Regular Expenses</h1>
+<div className="flex flex-col w-full max-w-4xl overflow-x-auto mt-8">
+  <table className="table w-full">
+    <thead className="bg-base-200">
+      <tr>
+        <th className="text-sm lg:text-base p-2">Category</th>
+        <th className="text-sm lg:text-base p-2">Cost</th>
+        <th className="text-sm lg:text-base p-2">Notes</th>
+        <th className="text-sm lg:text-base p-2">Mileage</th>
+        <th className="text-sm lg:text-base p-2">Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {regularExpenses.map(expense => (
+        <tr className="hover" key={expense._id}>
+          <td className="p-2">{expense.category}</td>
+          <td className="p-2">${expense.cost}</td>
+          <td className="p-2">{expense.notes}</td>
+          <td className="p-2">{expense.mileage} miles</td>
+          <td className="p-2">{new Date(expense.date).toLocaleDateString()}</td>
+        </tr>
+      ))}
+    </tbody>
+  </table>
+</div>
+  
         </div>
+      </>
     );
 }
 
