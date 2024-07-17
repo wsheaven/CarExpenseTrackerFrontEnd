@@ -166,16 +166,18 @@ const AddExpenses = () => {
       <>
         {success ? (
           <section className="flex flex-col items-center justify-center min-h-screen px-4">
-            <div className="w-full max-w-md p-8 space-y-6 bg-neutral rounded-lg shadow-md text-center">
+            <div className="w-full max-w-md p-8 space-y-6 bg-base-200  rounded-lg shadow-md text-center">
               <h1 className="text-2xl font-bold">Success!</h1>
               <p>
                 <Link to="/ViewExpenses" className="text-blue-500 hover:text-blue-700">View Expenses</Link>
               </p>
+              <p>Or</p>
+              <p><Link to="/addexpense" className="text-blue-500 hover:text-blue-700">Add Another Expense</Link></p>
             </div>
           </section>
         ) : (
           <section className="flex flex-col items-center justify-center min-h-screen px-4">
-            <div className="w-full max-w-md p-8 space-y-6 bg-neutral rounded-lg shadow-md">
+            <div className="w-full max-w-md p-8 space-y-6 bg-base-200 rounded-lg shadow-md">
               <p ref={errRef} className={errMsg ? "errmsg" : "offscreen"} aria-live="assertive">
                 {errMsg}
               </p>
