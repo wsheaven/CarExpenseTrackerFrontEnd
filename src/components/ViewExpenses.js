@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import useAuth from "../hooks/useAuth";
 import useAxiosPrivate from "../hooks/useAxiosPrivate";
-import { Link, useNavigate, useLocation } from 'react-router-dom';
-import useLogout from '../hooks/useLogout';
+import {useNavigate, useLocation } from 'react-router-dom';
+
 import '../index.css';
 
 const EXPENSE_URL = '/api/expenses/user/';
@@ -13,12 +13,6 @@ const ViewExpenses = () => {
     const axiosPrivate = useAxiosPrivate();
     const navigate = useNavigate()
     const location = useLocation()
-    const logout = useLogout()
-
-    const signOut = async () => {
-        await logout()
-        navigate('/login')
-    }
 
     useEffect(() => {
         const fetchExpenses = async () => {

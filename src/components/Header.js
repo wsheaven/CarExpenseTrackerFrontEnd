@@ -13,9 +13,7 @@ const Header = () => {
     const { auth } = useAuth();
     const [currentTheme, setCurrentTheme] = useState(localStorage.getItem("theme"))
 
-    // useEffect(() => {
-    //     themeChange(false)
-    //   }, [])
+
 
     useEffect(() => {
         themeChange(false)
@@ -26,7 +24,6 @@ const Header = () => {
                 setCurrentTheme("light")
             }
         }
-        // 👆 false parameter is required for react project
       }, [])
     
 
