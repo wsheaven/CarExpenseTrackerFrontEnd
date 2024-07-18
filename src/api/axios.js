@@ -1,5 +1,5 @@
 import axios from "axios"
-const BASE_URL = 'http://10.21.6.165:3500'
+const BASE_URL = 'https://car-expense-tracker-api.onrender.com'
 
 export default axios.create({
     baseURL: BASE_URL

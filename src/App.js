@@ -16,16 +16,14 @@ function App() {
       <Route path="/" element={<Layout />}>
         <Route path="Login" element={<Login />} />
         <Route path="Register" element={<Register />} />
-        
 
         <Route path="/" element={<Home />} />
 
         <Route element={<PersistLogin />}>
-        <Route element={<RequireAuth />}>
-          <Route path="ViewExpenses" element={<ViewExpenses />} />
-          <Route path="AddExpense" element={<AddExpenses />} />
-          <Route path="Unauthorized" element={<Unauthorized />} />
-        </Route>
+          <Route element={<RequireAuth />}>
+            <Route path="ViewExpenses" element={<ViewExpenses />} />
+            <Route path="AddExpense" element={<AddExpenses />} />
+          </Route>
         </Route>
         <Route path="Missing" element={<Missing />} />
       </Route>
