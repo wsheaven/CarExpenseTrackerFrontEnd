@@ -8,7 +8,7 @@ import useAuth from "../hooks/useAuth";
 const CATEGORY_REGEX = /^[A-Za-z\s]{1,}$/; // Allows alphabetic characters and spaces, at least 1 character long
 const COST_REGEX = /^\d+(\.\d{1,2})?$/; // Allows numbers with up to two decimal places
 const MILEAGE_REGEX = /^\d+$/; // Allows only positive integers
-const DATE_REGEX = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{2}$/; // Simple date format MM/DD/YY
+const DATE_REGEX = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{4}$/; // Simple date format MM/DD/YYYY
 const MILES_TRAVELED_FOR_GAS_REGEX = /^\d+$/; // Allows only positive integers
 const GAS_GALLONS_REGEX = /^\d+(\.\d{1,3})?$/; // Allows numbers with up to three decimal places
 const ADD_EXPENSE_URL = "/expenses";
