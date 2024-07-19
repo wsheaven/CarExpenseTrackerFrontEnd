@@ -8,7 +8,6 @@ import useAuth from "../hooks/useAuth";
 const CATEGORY_REGEX = /^[A-Za-z\s]{1,}$/; // Allows alphabetic characters and spaces, at least 1 character long
 const COST_REGEX = /^\d+(\.\d{1,2})?$/; // Allows numbers with up to two decimal places
 const MILEAGE_REGEX = /^\d+$/; // Allows only positive integers
-const DATE_REGEX = /^(0[1-9]|1[0-2])\/(0[1-9]|[12][0-9]|3[01])\/\d{4}$/; // Simple date format MM/DD/YYYY
 const MILES_TRAVELED_FOR_GAS_REGEX = /^\d+$/; // Allows only positive integers
 const GAS_GALLONS_REGEX = /^\d+(\.\d{1,3})?$/; // Allows numbers with up to three decimal places
 const ADD_EXPENSE_URL = "/expenses";
@@ -25,9 +24,6 @@ const AddExpenses = () => {
 
   const [mileage, setMileage] = useState("");
   const [validMileage, setValidMileage] = useState(false);
-
-  const [date, setDate] = useState("");
-  const [validDate, setValidDate] = useState(false);
 
   const [notes, setNotes] = useState("");
 
@@ -60,10 +56,6 @@ const AddExpenses = () => {
   }, [mileage]);
 
   useEffect(() => {
-    setValidDate(DATE_REGEX.test(date));
-  }, [date]);
-
-  useEffect(() => {
     if (isGasExpense) {
       setValidMilesTraveledForGas(
         MILES_TRAVELED_FOR_GAS_REGEX.test(milesTraveledForGas)
@@ -78,7 +70,6 @@ const AddExpenses = () => {
     category,
     cost,
     mileage,
-    date,
     notes,
     isGasExpense,
     milesTraveledForGas,
@@ -91,9 +82,8 @@ const AddExpenses = () => {
     const isValidCategory = CATEGORY_REGEX.test(category);
     const isValidCost = COST_REGEX.test(cost);
     const isValidMileage = MILEAGE_REGEX.test(mileage);
-    const isValidDate = DATE_REGEX.test(date);
 
-    if (!isValidCategory || !isValidCost || !isValidMileage || !isValidDate) {
+    if (!isValidCategory || !isValidCost || !isValidMileage) {
       setErrMsg("Invalid Entry in required fields");
       return;
     }
@@ -117,7 +107,6 @@ const AddExpenses = () => {
           category,
           cost,
           mileage,
-          date,
           notes,
           isGasExpense,
           milesTraveledForGas,
@@ -138,7 +127,6 @@ const AddExpenses = () => {
       setCategory("");
       setCost("");
       setMileage("");
-      setDate("");
       setNotes("");
       setIsGasExpense(false);
       setMilesTraveledForGas("");
@@ -161,7 +149,7 @@ const AddExpenses = () => {
     <>
       {success ? (
         <section className="flex flex-col items-center justify-center min-h-screen px-4">
-          <div className="w-full max-w-md p-8 space-y-6 bg-base-200  rounded-lg shadow-md text-center">
+          <div className="w-full max-w-md p-8 space-y-6 bg-base-200 rounded-lg shadow-md text-center">
             <h1 className="text-2xl font-bold">Success!</h1>
             <p>
               <Link
@@ -273,31 +261,6 @@ const AddExpenses = () => {
                 />
               </label>
 
-              <label className="input input-bordered flex items-center gap-2 w-full">
-                <FontAwesomeIcon
-                  icon={faCheck}
-                  className={validDate ? "text-green-500 h-5 w-5" : "hidden"}
-                />
-                <FontAwesomeIcon
-                  icon={faTimes}
-                  className={
-                    validDate || !date ? "hidden" : "text-red-500 h-5 w-5"
-                  }
-                />
-                <input
-                  type="text"
-                  id="date"
-                  onChange={(e) => {
-                    setDate(e.target.value);
-                    setValidDate(DATE_REGEX.test(e.target.value));
-                  }}
-                  value={date}
-                  required
-                  placeholder="Date (MM/DD/YY)"
-                  className="grow"
-                />
-              </label>
-
               <textarea
                 className="textarea textarea-bordered gap-2 w-full"
                 id="notes"
@@ -391,7 +354,6 @@ const AddExpenses = () => {
                   !validCategory ||
                   !validCost ||
                   !validMileage ||
-                  !validDate ||
                   (isGasExpense &&
                     (!validMilesTraveledForGas || !validGasGallons))
                 }
